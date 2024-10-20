@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scoreboard</title>
+    <style>
+        .scoreboard__teams {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="config">
+    Teamnamen aufnehmen:
+
+    <button onclick="addTeam()">Team hinzufügen</button>
+    <ul>
+    </ul>
+
+    <button onclick="toggleView()">Scoreboard anzeigen</button>
+</div>
+
+
+<div class="scoreboard" hidden>
+    <h1 onclick="toggleView()">Scoreboard</h1>
+    <div class="scoreboard__teams">
+
+    </div>
+</div>
+
+<script>
+    function toggleView() {
+        const config = document.querySelector("div.config");
+        config.hidden = !config.hidden;
+        const scoreboard = document.querySelector("div.scoreboard");
+        scoreboard.hidden = !scoreboard.hidden;
+    }
+
+    function addTeam() {
+        console.log('addTeam');
+        const list = document.querySelector("ul");
+        const teams = document.querySelector("div.scoreboard__teams");
+        const listItem = document.createElement('li');
+        const element = document.createElement("team-name-input");
+
+        const scoreBoardTeams = document.querySelector("div.scoreboard__teams");
+        const teamScore = document.createElement("team-score")
+
+        element.addEventListener('delete', evt => {
+            list.removeChild(evt.target.parentNode);
+            teams.removeChild(teamScore)
+        });
+
+        scoreBoardTeams.appendChild(teamScore);
+
+        element.addEventListener('updateName', evt => {
+            teamScore.setName(evt.detail);
+        });
+
+        listItem.appendChild(element);
+
+        list.appendChild(listItem);
+    }
+
+    class TeamNameInput extends HTMLElement {
+        connectedCallback() {
+            const shadow = this.attachShadow({ mode: "open" });
+
+            const id = crypto.randomUUID();
+
+            const wrapper = document.createElement("div");
+
+            const label = document.createElement("label");
+            label.textContent = "Team name: "
+            label.htmlFor = id;
+            wrapper.appendChild(label);
+
+            const input = document.createElement("input");
+            input.id = id;
+            input.addEventListener('input', evt => {
+                const event = new CustomEvent('updateName', { detail: input.value });
+                this.dispatchEvent(event);
+            });
+            wrapper.appendChild(input);
+
+            const button = document.createElement("button")
+            button.textContent = 'löschen'
+            button.addEventListener('click', evt => {
+                const event = new CustomEvent('delete');
+                this.dispatchEvent(event);
+            })
+            wrapper.appendChild(button);
+
+            shadow.appendChild(wrapper);
+        }
+    }
+
+    customElements.define("team-name-input", TeamNameInput);
+
+    class TeamScore extends HTMLElement {
+
+        setName(name) {
+            this.label.textContent = `Team ${name}`;
+        }
+
+        connectedCallback() {
+            const shadow = this.attachShadow({ mode: "open" });
+
+            const id = crypto.randomUUID();
+
+            const wrapper = document.createElement("div");
+            wrapper.classList.add('counter');
+
+            this.label = document.createElement("label");
+            this.label.textContent = "Team ";
+            this.label.htmlFor = id;
+            wrapper.appendChild(this.label);
+
+            const input = document.createElement("input");
+            input.classList.add('counter__value');
+            input.type = 'number';
+            input.value = 0;
+            input.id = id;
+            wrapper.appendChild(input);
+
+            const style = document.createElement("style");
+
+            style.textContent = `
+                .counter {
+                    display: flex;
+                    flex-direction: column;
+                    border: grey solid;
+                    padding: 1rem;
+                    border-radius: 10px;
+                    align-items: center;
+                    width: 100px;
+                }
+                .counter__value {
+                    font-size: 2rem;
+                    width: 100%;
+                    direction: rtl;
+                }
+            `;
+            shadow.appendChild(style);
+            shadow.appendChild(wrapper);
+        }
+    }
+
+    customElements.define("team-score", TeamScore);
+</script>
+</body>
+</html>
