@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Component Example</title>
+</head>
+<body>
+
+<my-custom-element size="100"></my-custom-element>
+
+
+<script>
+    class MyCustomElement extends HTMLElement {
+        static observedAttributes = ["color", "size"];
+
+        connectedCallback() {
+            console.log("Custom element added to page.");
+            // element added to document
+            // better use this than the constructor
+
+            // Create a shadow root
+            const shadow = this.attachShadow({ mode: "open" });
+
+            const header = document.createElement("h1");
+            header.textContent = "Hello World";
+
+            shadow.appendChild(header);
+
+        }
+
+        disconnectedCallback() {
+            console.log("Custom element removed from page.");
+            // element removed from document
+        }
+
+        adoptedCallback() {
+            console.log("Custom element moved to new page.");
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            console.log(`Attribute ${name} has changed.`)
+        }
+    }
+
+    customElements.define("my-custom-element", MyCustomElement);
+</script>
+</body>
+</html>

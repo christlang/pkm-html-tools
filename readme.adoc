@@ -1,0 +1,5 @@
+== Small tools with simple HTML, CSS, JS
+
+base is Web Components
+
+https://developer.mozilla.org/en-US/docs/Web/API/Web_components
